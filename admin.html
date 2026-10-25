@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Админ | Турк Бөөний Барааны Агуулах</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b0b0c">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+  <header class="header">
+    <div class="wrap header__in">
+      <a class="brand" href="index.html" aria-label="Каталог руу буцах">
+        <span class="brand__mark">ТБ</span>
+        <span class="brand__text"><strong>Турк Бөөний</strong><small>Админ удирдлага</small></span>
+      </a>
+      <div class="header__actions">
+        <a class="btn btn--sm adm-back" href="index.html">Каталог үзэх</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap adm">
+    <div class="adm__notice">
+      <span data-icon="lock"></span>
+      <p><strong>Демо горим.</strong> Энд хийсэн өөрчлөлт зөвхөн энэ хөтөч дээр хадгалагдаж, каталог дээр шууд харагдана. Бүх хэрэглэгчид харуулахын тулд «Өгөгдөл татах» товчоор файл аваад <code>js/data.js</code> файлд оруулна.</p>
+    </div>
+
+    <div class="adm__head">
+      <div>
+        <p class="eyebrow">Удирдлага</p>
+        <h1>Бүтээгдэхүүн ба захиалга</h1>
+      </div>
+      <div class="adm__tabs" role="tablist">
+        <button class="adm__tab is-active" type="button" role="tab" data-tab="products" aria-selected="true">Бүтээгдэхүүн <em id="tabCountProducts">0</em></button>
+        <button class="adm__tab" type="button" role="tab" data-tab="orders" aria-selected="false">Захиалга <em id="tabCountOrders">0</em></button>
+      </div>
+    </div>
+
+    <section class="adm__stats" id="stats"></section>
+
+    <!-- Бүтээгдэхүүн -->
+    <section id="tab-products" class="adm__panel">
+      <div class="adm__bar">
+        <div class="toolbar__search">
+          <span data-icon="search"></span>
+          <label class="sr" for="admSearch">Бараа хайх</label>
+          <input id="admSearch" type="search" placeholder="Нэр, брэндээр хайх">
+        </div>
+        <select id="admCat" aria-label="Ангиллаар шүүх"></select>
+        <button class="btn btn--gold" type="button" id="addProduct"><span data-icon="plus"></span> Шинэ бараа</button>
+        <button class="btn btn--ghost" type="button" id="exportData"><span data-icon="download"></span> Өгөгдөл татах</button>
+        <button class="btn btn--ghost" type="button" id="resetData"><span data-icon="reset"></span> Анхны байдал</button>
+      </div>
+
+      <div class="adm__table-wrap">
+        <table class="adm__table">
+          <thead>
+            <tr>
+              <th>Зураг</th>
+              <th>Бүтээгдэхүүн</th>
+              <th>Ангилал</th>
+              <th class="num">Үнэ (₮)</th>
+              <th class="num">Доод захиалга</th>
+              <th class="num">Нөөц</th>
+              <th>Онцлох</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="productRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Захиалга -->
+    <section id="tab-orders" class="adm__panel" hidden>
+      <div class="adm__bar">
+        <p class="adm__hint">Каталогоос илгээсэн захиалгууд энд харагдана.</p>
+        <button class="btn btn--ghost" type="button" id="clearOrders"><span data-icon="trash"></span> Бүгдийг устгах</button>
+      </div>
+      <div id="orderList" class="orders"></div>
+    </section>
+  </main>
+
+  <!-- Бараа засах / нэмэх -->
+  <div class="modal" id="editModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel modal__panel--wide" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <button class="modal__close" data-close aria-label="Хаах" data-icon="close"></button>
+      <form id="editForm" class="edit" novalidate>
+        <div class="edit__media">
+          <div class="edit__preview" id="editPreview"></div>
+          <div class="field">
+            <label for="eImage">Зургийн холбоос</label>
+            <input id="eImage" name="image" placeholder="https://... эсвэл images/файл.jpg">
+          </div>
+          <label class="btn btn--ghost btn--block edit__upload">
+            <span data-icon="image"></span> Компьютерээс зураг сонгох
+            <input type="file" id="eFile" accept="image/*" hidden>
+          </label>
+          <p class="fine">Сонгосон зургийг 900px хүртэл жижигрүүлж хадгална.</p>
+          <div class="field">
+            <label for="eCredit">Зургийн эх сурвалж</label>
+            <input id="eCredit" name="credit" placeholder="Зохиогч, лиценз">
+          </div>
+        </div>
+        <div class="edit__fields">
+          <p class="eyebrow" id="editEyebrow">Засах</p>
+          <h2 id="editTitle">Бүтээгдэхүүн</h2>
+          <div class="field"><label for="eName">Нэр <b>*</b></label><input id="eName" name="name" required><small class="err"></small></div>
+          <div class="grid2">
+            <div class="field"><label for="eCategory">Ангилал</label><select id="eCategory" name="category"></select></div>
+            <div class="field"><label for="eBrand">Брэнд</label><input id="eBrand" name="brand"></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label for="ePrice">Үнэ (₮) <b>*</b></label><input id="ePrice" name="price" type="number" min="0" step="100" required><small class="err"></small></div>
+            <div class="field"><label for="eUnit">Нэгж</label><input id="eUnit" name="unit" placeholder="ширхэг"></div>
+            <div class="field"><label for="eMin">Доод захиалга</label><input id="eMin" name="minOrder" type="number" min="1"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label for="eStock">Нөөц</label><input id="eStock" name="stock" type="number" min="0"></div>
+            <div class="field field--check"><label><input type="checkbox" id="eFeatured" name="featured"> Нүүр хуудсанд онцлох</label></div>
+          </div>
+          <div class="field"><label for="eShort">Товч тайлбар</label><input id="eShort" name="short"></div>
+          <div class="field"><label for="eDesc">Дэлгэрэнгүй тайлбар</label><textarea id="eDesc" name="description" rows="4"></textarea></div>
+          <div class="field">
+            <label for="eDetails">Нэмэлт мэдээлэл <span class="fine">(мөр бүрт «Нэр: Утга»)</span></label>
+            <textarea id="eDetails" name="details" rows="4" placeholder="Хэмжээ: 90 × 180 см&#10;Материал: 100% хөвөн"></textarea>
+          </div>
+          <div class="edit__actions">
+            <button class="btn btn--ghost" type="button" data-close>Болих</button>
+            <button class="btn btn--gold" type="submit">Хадгалах</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
